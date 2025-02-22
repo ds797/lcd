@@ -1,3 +1,6 @@
+#ifndef DIR_H
+#define DIR_H
+
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -31,3 +34,5 @@ public:
 		return directories;
 	}
 };
+
+#endif
