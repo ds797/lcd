@@ -1,0 +1,5 @@
+# Executable
+lcd
+
+# Object files
+*.o
