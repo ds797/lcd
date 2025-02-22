@@ -11,6 +11,11 @@ class tui {
 private:
 	static termios orig_termios;
 public:
+	static void clear_screen() {
+		// Clear screen, move cursor
+		std::cout << "\033[2J\033[1;1H";
+	}
+
 	static void alt_buffer() {
 		// Hide cursor, save position, enable alternate buffer, move cursor
 		std::cout << "\033[?25l\033[s\033[?1049h\033[1;1H";
