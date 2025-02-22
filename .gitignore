@@ -3,3 +3,6 @@ lcd
 
 # Object files
 *.o
+
+# Config files
+.clangd
