@@ -2,7 +2,8 @@ CC = g++
 CVER = -std=c++23
 CFLAGS = -Wall -g $(CVER)
 
-OBJ = main.o tui.o
+SRC = $(wildcard *.cpp)
+OBJ = $(SRC:.cpp=.o)
 
 TARGET = lcd
 
