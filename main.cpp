@@ -8,13 +8,14 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
+	// Register CTRL+C handler
 	signal(SIGINT, tui::handle_sigint);
 
-	tui::alt_buffer();	
 	tui::raw_mode();
+	tui::alt_buffer();	
 
 	while (true) {}
 
-	tui::cooked_mode();
 	tui::main_buffer();
+	tui::cooked_mode();
 }
