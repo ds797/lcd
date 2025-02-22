@@ -12,10 +12,14 @@ private:
 	static termios orig_termios;
 public:
 	static void alt_buffer() {
-		std::cout << "\033[?1049h";
+		// Hide cursor, save position, enable alternate buffer, move cursor
+		std::cout << "\033[?25l\033[s\033[?1049h\033[1;1H";
+		std::cout.flush();
 	}
 	static void main_buffer() {
-		std::cout << "\033[?1049l";
+		// Disable alternate buffer, restore position, and show cursor
+		std::cout << "\033[?1049l\033[u\033[?25h"; 
+		std::cout.flush();
 	}
 
 	// Switch to main screen buffer and cooked mode
