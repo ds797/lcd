@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <vector>
 
@@ -32,6 +33,18 @@ public:
 
 		// Uses move semantics, so it's plenty fast
 		return directories;
+	}
+
+	static int index_of(
+		std::vector<fs::path>::iterator begin,
+		std::vector<fs::path>::iterator end,
+		const fs::path& path
+	) {
+		auto it = std::find(begin, end, path);
+
+		if (it != end) return std::distance(begin, it);
+
+		return -1;
 	}
 };
 

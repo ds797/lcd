@@ -36,8 +36,15 @@ int main(int argc, char** argv) {
 	do {
 		if (c == 'q') break;
 
-		if (c == 'h') cwd = cwd.parent_path();
-		std::vector<fs::path> directories = dir::list_directories(cwd);
+		std::vector<fs::path> directories;
+
+		if (c == 'h') {
+			fs::path old = cwd;
+			cwd = cwd.parent_path();
+			directories = dir::list_directories(cwd);
+			int i = dir::index_of(directories.begin(), directories.end(), old);
+			index = i == -1 ? 0 : i;
+		} else directories = dir::list_directories(cwd);
 		if (c == 'l') {
 			cwd = directories[index];
 			directories = dir::list_directories(cwd);
