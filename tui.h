@@ -3,9 +3,11 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <string>
 #include <termios.h>
 #include <unistd.h>
 #include <signal.h>
+#include "color.h"
 
 class tui {
 private:
@@ -14,6 +16,18 @@ public:
 	static void clear_screen() {
 		// Clear screen, move cursor
 		std::cout << "\033[2J\033[1;1H";
+	}
+
+	static void set_color(const int fg, const int bg) {
+		std::string command = "";
+		if (bg == -1) command += "\033[49m";
+		else command += "\033[" + std::to_string(bg) + "m";
+
+		command += "\033[" + std::to_string(fg) + "m";
+		std::cout << command;
+	}
+	static void reset_color() {
+		std::cout << "\033[0m";
 	}
 
 	static void alt_buffer() {
