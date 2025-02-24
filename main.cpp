@@ -31,12 +31,15 @@ int main(int argc, char** argv) {
 
 	char c = 0;
 	int index = 0;
+	int frame = 0;
 	fs::path cwd = dir::get_cwd();
 
 	do {
 		if (c == 'q') break;
 
 		std::vector<fs::path> directories;
+
+		int lines_to_draw = ws.ws_row - 1;
 
 		if (c == 'h') {
 			fs::path old = cwd;
@@ -57,16 +60,25 @@ int main(int argc, char** argv) {
 			if (--index == -1) index = directories.size() - 1;
 		}
 
-		tui::clear_screen();
+		if (index < frame) {
+			frame = index;
+		} else if (index + 1 > frame + lines_to_draw) {
+			frame = index + 1 - lines_to_draw;
+		}
 
-		std::cout << "CWD: " << cwd << "\n";
+		tui::clear_screen();
+		std::cout << "CWD: " << cwd << ", current line: " << index + 1 << "\n";
 
 		// We printed one line already
-		for (int i = 0; i < ws.ws_row - 1; i++) {
+		for (int i = frame; i < frame + lines_to_draw; i++) {
 			if (directories.size() <= i) break;
+
 			if (i == index) tui::set_color(color::fg::black, color::bg::white);
-			std::cout << directories[i] << (i < ws.ws_row - 2 ? "\n" : "");
+			std::cout << directories[i] << (i + 1 < frame + lines_to_draw ? "\n" : "");
 			if (i == index) tui::reset_color();
+
+			// Flush the last row
+			if (i + 1 == frame + lines_to_draw) std::cout.flush();
 		}
 	} while (read(STDIN_FILENO, &c, 1));
 
