@@ -60,10 +60,23 @@ void view::navigate_into() {
 void view::highlight_previous() {
 	// Penultimate pane is the one we navigate in
 	panes[pane_count - 2]->highlight_previous();
+
+	// Update path
+	path = panes[pane_count - 2]->dir_at(panes[pane_count - 2]->get_index());
+
+	// Update child pane
+	panes[pane_count - 1]->set_path(path);
 }
 
 void view::highlight_next() {
+	// Penultimate pane is the one we navigate in
 	panes[pane_count - 2]->highlight_next();
+
+	// Update path
+	path = panes[pane_count - 2]->dir_at(panes[pane_count - 2]->get_index());
+
+	// Update child pane
+	panes[pane_count - 1]->set_path(path);
 }
 
 void view::draw() {
