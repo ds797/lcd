@@ -37,18 +37,10 @@ int main(int argc, char** argv) {
 	do {
 		if (c == 'q') break;
 
-		if (c == 'h') {
-			state->navigate_up();
-		}
-		if (c == 'l') {
-			state->navigate_into();
-		}
-		if (c == 'j') {
-			state->highlight_next();
-		}
-		if (c == 'k') {
-			state->highlight_previous();
-		}
+		if (c == 'h') state->navigate_up();
+		if (c == 'l') state->navigate_into();
+		if (c == 'j') state->highlight_next();
+		if (c == 'k') state->highlight_previous();
 
 		tui::clear_screen();
 		std::cout << state->active_dir() << "\n";
