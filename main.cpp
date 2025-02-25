@@ -1,5 +1,6 @@
 #include <asm-generic/ioctls.h>
 #include <csignal>
+#include <filesystem>
 #include <iostream>
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -8,9 +9,12 @@
 #include "dir.h"
 
 int main(int argc, char** argv) {
-	if (argc < 2 || 2 < argc) {
-		std::cout << "Usage: lcd <path>\n";
+	if (2 < argc) {
+		std::cout << "Usage: lcd [path]\n";
 		return 1;
+	} else if (argc == 2 && !fs::exists(argv[1])) {
+		std::cout << "Invalid path\n";
+		return -1;
 	}
 
 	// Register CTRL+C handler
@@ -25,15 +29,16 @@ int main(int argc, char** argv) {
 	tui::raw_mode();
 	tui::alt_buffer();
 
-	char c = 0;
+	fs::path initial_path = argc == 2 ? std::filesystem::absolute(argv[1]) : dir::get_cwd();
 
 	state::view* state = new state::view(
 		ws.ws_col,
 		// We printed one line already
 		ws.ws_row - 1,
-		dir::get_cwd()
+		initial_path
 	);
 
+	char c = 0;
 	do {
 		if (c == 'q') break;
 
