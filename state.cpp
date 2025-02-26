@@ -32,9 +32,15 @@ fs::path view::active_dir() {
 }
 
 void view::navigate_up() {
+	int root_index = -1;
+	for (int i = pane_count - 1; i >= 0; i--) {
+		if (panes[i]->get_path() == "/") {
+			root_index = i;
+			break;
+		}
+	}
 	// Can't navigate up a directory, we're already at the root
-	// FIXME: can't change above certain point (leftmost is at root)
-	if (panes[0]->get_path() == "/") return;
+	if (root_index == pane_count - 2) return;
 
 	// Save current path in temp
 	fs::path temp = path;
@@ -46,10 +52,15 @@ void view::navigate_up() {
 		*panes[i] = std::move(*panes[i - 1]);
 	}
 
-	std::vector<fs::path> dirs = dir::list_directories(temp.parent_path());
-	int selected = dir::index_of(dirs.begin(), dirs.end(), temp);
+	if (root_index != -1) {
+		std::vector<fs::path> empty;
+		panes[0] = std::make_unique<pane>(height, empty);
+	} else {
+		std::vector<fs::path> dirs = dir::list_directories(temp.parent_path());
+		int selected = dir::index_of(dirs.begin(), dirs.end(), temp);
 
-	panes[0] = std::make_unique<pane>(height, dirs, selected);
+		panes[0] = std::make_unique<pane>(height, dirs, selected);
+	}
 }
 
 void view::navigate_into() {
