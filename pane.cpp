@@ -1,7 +1,7 @@
 #include "pane.h"
-#include "dir.h"
 #include "tui.h"
 #include "color.h"
+#include <string>
 
 void pane::update_frame() {
 	int last_index = height - 1;
@@ -15,30 +15,47 @@ void pane::update_frame() {
 	}
 }
 
-pane::pane(int height, fs::path path) {
+pane::pane(int height, std::vector<fs::path> directories) {
 	this->height = height;
-	this->path = path;
-
-	directories = dir::list_directories(this->path);
-	index = -1;
+	this->directories = directories;
+	this->index = 0;
+	this->frame = 0;
+	this->has_index = false;
 }
 
-pane::pane(int height, fs::path path, fs::path selected, int dbg) {
+pane::pane(int height, std::vector<fs::path> directories, int selected) {
 	this->height = height;
-	this->path = path;
-
-	directories = dir::list_directories(this->path);
-	index = dir::index_of(directories.begin(), directories.end(), selected);
+	this->directories = directories;
+	this->index = selected;
+	this->frame = 0;
+	this->has_index = true;
 
 	update_frame();
 }
 
-fs::path pane::get_path() {
-	return path;
+std::string pane::info() {
+	std::string s = "";
+
+	if (directories.size() > 0) {
+		s += "Curdir: ";
+		s += directories[index];
+	} else {
+		s += "Contains no directories";
+	}
+
+	s += ", index: ";
+	s += std::to_string(index);
+	s += "!";
+
+	return s;
 }
 
 int pane::size() {
 	return directories.size();
+}
+
+fs::path pane::get_path() {
+	return directories[this->index].parent_path();
 }
 
 fs::path pane::dir_at(int index) {
@@ -53,15 +70,17 @@ int pane::get_frame() {
 	return frame;
 }
 
-void pane::set_path(fs::path path) {
-	directories = dir::list_directories(path);
-	index = -1;
-	frame = 0;
+void pane::set_dirs(std::vector<fs::path> directories) {
+	this->directories = directories;
+	this->index = 0;
+	this->frame = 0;
 }
 
-void pane::set_path(fs::path path, fs::path selected) {
-	directories = dir::list_directories(path);
-	index = dir::index_of(directories.begin(), directories.end(), selected);
+void pane::set_dirs(std::vector<fs::path> directories, int frame, int selected) {
+	this->directories = directories;
+	this->frame = frame;
+	this->index = selected;
+
 	update_frame();
 }
 
@@ -78,25 +97,39 @@ void pane::highlight_next() {
 void pane::draw_line(int line_number, int width) {
 	int selected = this->index;
 	int index = frame + line_number;
-	std::string s = "";
-
 
 	if (directories.size() <= frame + line_number) {
+		std::string s = "";
 		for (int i = 0; i < width; i++) s += " ";
 		std::cout << s;
 		return;
 	}
 
 	std::string name = directories[frame + line_number].filename();
-	if (name.size() > width) {
-		s += name.substr(0, width);
-	} else s += name;
 
 	if (index == selected) tui::set_color(color::fg::black, color::bg::white);
-	std::cout << s;
+	std::cout << name.substr(0, width);
 	if (index == selected) tui::reset_color();
-	s = "";
 
-	for (int i = 0; i < width - name.size(); i++) s += " ";
-	if (s.size() > 0) std::cout << s;
+	std::string s = "";
+	// name.size() is a uint
+	for (int i = 0; i < width - static_cast<int>(name.size()); i++) s += " ";
+	std::cout << s;
+}
+
+pane& pane::operator=(pane&& src) {
+	if (&src == this) return *this;
+
+	this->directories = std::move(src.directories);
+	if (this->has_index) {
+		this->index = src.index;
+		this->frame = src.frame;
+	} else {
+		this->index = 0;
+		this->frame = 0;
+	}
+	src.index = 0;
+	src.frame = 0;
+
+	return *this;
 }

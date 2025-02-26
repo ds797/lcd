@@ -22,9 +22,6 @@ namespace state {
 		std::unique_ptr<std::unique_ptr<pane>[]> panes;
 		fs::path path;
 
-		void init_panes();
-		void update_panes();
-
 		// Disable copy/move semantics
 		view(view&);
 		view(view&&);
