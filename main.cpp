@@ -1,6 +1,7 @@
 #include <asm-generic/ioctls.h>
 #include <csignal>
 #include <filesystem>
+#include <fcntl.h>
 #include <iostream>
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -21,10 +22,17 @@ int main(int argc, char** argv) {
 	signal(SIGINT, tui::handle_sigint);
 
 	struct winsize ws;
-	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1) {
+	int tty = open("/dev/tty", O_RDWR);
+	if (ioctl(tty, TIOCGWINSZ, &ws) == -1) {
 		std::cerr << "Error getting terminal size\n";
 		return -1;
 	}
+
+	// Save original STDOUT
+	int stdout = dup(STDOUT_FILENO);
+	// Redirect STDOUT to the tty
+	dup2(tty, STDOUT_FILENO);
+	close(tty);
 
 	tui::raw_mode();
 	tui::alt_buffer();
@@ -47,8 +55,22 @@ int main(int argc, char** argv) {
 		if (c == 'j') state->highlight_next();
 		if (c == 'k') state->highlight_previous();
 
+		fs::path active_dir = state->active_dir();
+
+		if (c == '\r' || c == '\n') {
+			tui::main_buffer();
+			tui::cooked_mode();
+
+			// Revert STDOUT
+			dup2(stdout, STDOUT_FILENO);
+			close(stdout);
+
+			std::cout << "Switching working directory to " << active_dir << "...\n";
+			return 0;
+		}
+
 		tui::clear_screen();
-		std::cout << state->active_dir() << "\n";
+		std::cout << active_dir << "\n";
 
 		state->draw();
 	} while (read(STDIN_FILENO, &c, 1));
