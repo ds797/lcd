@@ -27,8 +27,8 @@ view::view(int width, int height, fs::path cwd) {
 }
 
 fs::path view::active_dir() {
-	// Return active pane's path
-	return panes[pane_count - 2]->get_path();
+	pane& active_pane = *panes[pane_count - 2];
+	return active_pane.dir_at(active_pane.get_index());
 }
 
 void view::navigate_up() {
