@@ -110,11 +110,21 @@ void view::highlight_next() {
 }
 
 void view::jump_to_previous(char c) {
-	active_pane().jump_to_previous(c);
+	pane& p = active_pane();
+
+	p.jump_to_previous(c);
+
+	path = p.dir_at(p.get_index().value());
+	panes[pane_count - 1]->set_path(path);
 }
 
 void view::jump_to_next(char c) {
-	active_pane().jump_to_next(c);
+	pane& p = active_pane();
+
+	p.jump_to_next(c);
+
+	path = p.dir_at(p.get_index().value());
+	panes[pane_count - 1]->set_path(path);
 }
 
 void view::draw() {
