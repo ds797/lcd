@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
 		if (c == 'j') state->highlight_next();
 		if (c == 'k') state->highlight_previous();
 
-		fs::path active_dir = state->active_dir();
+		std::optional<fs::path> active_dir = state->active_dir();
 
 		if (c == '\r' || c == '\n') {
 			tui::main_buffer();
@@ -65,12 +65,18 @@ int main(int argc, char** argv) {
 			dup2(stdout, STDOUT_FILENO);
 			close(stdout);
 
-			std::cout << "Switching working directory to " << active_dir << "...\n";
+			if (active_dir.has_value()) {
+				std::cout << "Switching working directory to " << active_dir.value() << "...\n";
+			}
 			return 0;
 		}
 
 		tui::clear_screen();
-		std::cout << active_dir << "\n";
+		if (active_dir.has_value()) {
+			std::cout << active_dir.value() << "\n";
+		} else {
+			std::cout << "No active directory" << "\n";
+		}
 
 		state->draw();
 	} while (read(STDIN_FILENO, &c, 1));

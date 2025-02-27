@@ -22,6 +22,8 @@ namespace state {
 		std::unique_ptr<std::unique_ptr<pane>[]> panes;
 		fs::path path;
 
+		pane& active_pane();
+
 		// Disable copy/move semantics
 		view(view&);
 		view(view&&);
@@ -31,7 +33,7 @@ namespace state {
 		view(int width, int height, fs::path cwd);
 		~view();
 
-		fs::path active_dir();
+		std::optional<fs::path> active_dir();
 
 		void navigate_up();
 		void navigate_into();

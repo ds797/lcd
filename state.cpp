@@ -15,20 +15,23 @@ view::view(int width, int height, fs::path cwd) {
 
 	// Initialize panes
 	fs::path temp = path;
-	std::vector<fs::path> dirs = dir::list_directories(temp);
-	panes[pane_count - 1] = std::make_unique<pane>(height, dirs);
+	panes[pane_count - 1] = std::make_unique<pane>(height, temp);
 	for (int i = pane_count - 2; i >= 0; i--) {
-		fs::path p = temp;
+		fs::path selected = temp;
 		temp = temp.parent_path();
-		dirs = dir::list_directories(temp);
-		int selected = dir::index_of(dirs.begin(), dirs.end(), p);
-		panes[i] = std::make_unique<pane>(height, dirs, selected);
+		panes[i] = std::make_unique<pane>(height, temp, selected);
 	}
 }
 
-fs::path view::active_dir() {
-	pane& active_pane = *panes[pane_count - 2];
-	return active_pane.dir_at(active_pane.get_index());
+pane& view::active_pane() {
+	return *panes[pane_count - 2];
+}
+
+std::optional<fs::path> view::active_dir() {
+	pane& p = view::active_pane();
+	if (!p.get_index().has_value()) return {};
+
+	return p.dir_at(p.get_index().value());
 }
 
 void view::navigate_up() {
@@ -39,6 +42,7 @@ void view::navigate_up() {
 			break;
 		}
 	}
+
 	// Can't navigate up a directory, we're already at the root
 	if (root_index == pane_count - 2) return;
 
@@ -53,13 +57,9 @@ void view::navigate_up() {
 	}
 
 	if (root_index != -1) {
-		std::vector<fs::path> empty;
-		panes[0] = std::make_unique<pane>(height, empty);
+		panes[0] = std::make_unique<pane>(height);
 	} else {
-		std::vector<fs::path> dirs = dir::list_directories(temp.parent_path());
-		int selected = dir::index_of(dirs.begin(), dirs.end(), temp);
-
-		panes[0] = std::make_unique<pane>(height, dirs, selected);
+		panes[0] = std::make_unique<pane>(height, temp.parent_path(), temp);
 	}
 }
 
@@ -73,37 +73,40 @@ void view::navigate_into() {
 	fs::path temp = path;
 	for (int i = 0; i < pane_count - 1; i++) {
 		temp = path.parent_path();
+		std::optional<int> index = panes[i + 1]->get_index();
 		*panes[i] = std::move(*panes[i + 1]);
+		panes[i]->set_index(index.value_or(0));
 	}
 
-	std::vector<fs::path> dirs = dir::list_directories(path);
-	panes[pane_count - 1] = std::make_unique<pane>(height, dirs);
+	panes[pane_count - 1] = std::make_unique<pane>(height, path);
 }
 
 void view::highlight_previous() {
+	pane& p = active_pane();
+	if (!p.get_index().has_value()) return;
+
 	// Penultimate pane is the one we navigate in
-	panes[pane_count - 2]->highlight_previous();
+	p.highlight_previous();
 
 	// Update path
-	path = panes[pane_count - 2]->dir_at(panes[pane_count - 2]->get_index());
+	path = p.dir_at(p.get_index().value());
 
 	// Update child pane
-	std::vector<fs::path> dirs = dir::list_directories(path);
-	panes[pane_count - 1] = std::make_unique<pane>(height, dirs);
+	panes[pane_count - 1] = std::make_unique<pane>(height, path);
 }
 
 void view::highlight_next() {
-	// Penultimate pane is the one we navigate in
-	panes[pane_count - 2]->highlight_next();
+	pane& p = active_pane();
+	if (!p.get_index().has_value()) return;
 
-	pane& active_pane = *panes[pane_count - 2];
+	// Penultimate pane is the one we navigate in
+	p.highlight_next();
 
 	// Update path
-	path = active_pane.dir_at(active_pane.get_index());
+	path = p.dir_at(p.get_index().value());
 
 	// Update child pane
-	std::vector<fs::path> dirs = dir::list_directories(path);
-	panes[pane_count - 1]->set_dirs(dirs);
+	panes[pane_count - 1]->set_path(path);
 }
 
 void view::draw() {
@@ -120,32 +123,5 @@ void view::draw() {
 		std::cout << ((i < height - 1) ? "\n" : "");
 	}
 
-
-
-
-
-
-
-
-	// 	std::string parent = (parent_dirs[parent_frame + i]).string();
-	// 	std::string current = (current_dirs[current_frame + i]).string();
-	// 	bool parent_selected = (parent_frame + i) == parent_index;
-	// 	bool current_selected = (current_frame + i) == current_index;
-
-	// 	std::string s = "";
-	// 	int parent_padding = column_width - parent.size();
-	// 	int parent_end_index = parent_padding < 0 ? column_width : parent.size();
-	// 	s += parent.substr(0, parent_end_index);
-	// 	for (int i = 0; i < parent_padding; i++) s += " ";
-
-	// 	int current_padding = column_width - parent.size();
-	// 	int current_end_index = parent_padding < 0 ? column_width : parent.size();
-	// 	s += parent.substr(0, current_end_index);
-	// 	for (int i = 0; i < current_padding; i++) s += " ";
-
-	// 	for (int i = 0; i < column_width; i++) s += " ";
-
-	// 	std::cout << s << (i < (height - 1) ? "\n" : "");
-	// }
 	std::cout.flush();
 }
