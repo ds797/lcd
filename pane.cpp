@@ -165,7 +165,7 @@ void pane::jump_to_next(char c) {
 	}
 }
 
-void pane::draw_line(int line_number, int width) {
+void pane::draw_line(int line_number, int width, color::fg selected_foreground, color::bg selected_background) {
 	int index = frame + line_number;
 
 	if (directories.size() <= frame + line_number) {
@@ -177,7 +177,7 @@ void pane::draw_line(int line_number, int width) {
 
 	std::string name = directories[frame + line_number].filename();
 
-	if (index == this->index) tui::set_color(color::fg::black, color::bg::white);
+	if (index == this->index) tui::set_color(selected_foreground, selected_background);
 	std::cout << name.substr(0, width);
 	if (index == this->index) tui::reset_color();
 

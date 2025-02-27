@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include <vector>
+#include "color.h"
 
 namespace fs = std::filesystem;
 
@@ -11,8 +12,8 @@ class pane {
 	std::optional<fs::path> path;
 	std::vector<fs::path> directories;
 	std::optional<int> index;
-	int frame = 0;
 
+	int frame = 0;
 	void update_frame();
 
 	// Disable copy/move semantics
@@ -44,7 +45,7 @@ public:
 	void jump_to_previous(char);
 	void jump_to_next(char);
 
-	void draw_line(int index, int width);
+	void draw_line(int index, int width, color::fg selected_foreground, color::bg selected_background);
 
 	pane& operator=(pane&&);
 };

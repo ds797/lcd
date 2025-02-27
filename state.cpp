@@ -125,7 +125,15 @@ void view::draw() {
 	for (int i = 0; i < height; i++) {
 		for (int p = 0; p < pane_count; p++) {
 			int width = (p == (pane_count - 2)) ? main_width : pane_width;
-			panes[p]->draw_line(i, width);
+
+			color::bg bg = color::bg::white;
+			color::fg fg = color::fg::black;
+			if (p == pane_count - 2) {
+				bg = color::bg::white_intense;
+				fg = color::fg::black_bold;
+			}
+			panes[p]->draw_line(i, width, fg, bg);
+
 			if (p < pane_count - 1) std::cout << "│";
 		}
 		std::cout << ((i < height - 1) ? "\n" : "");
