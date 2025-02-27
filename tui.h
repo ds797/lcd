@@ -18,12 +18,12 @@ public:
 		std::cout << "\033[2J\033[1;1H";
 	}
 
-	static void set_color(const int fg, const int bg) {
+	static void set_color(const color::fg fg, const color::bg bg) {
 		std::string command = "";
-		if (bg == -1) command += "\033[49m";
-		else command += "\033[" + std::to_string(bg) + "m";
 
-		command += "\033[" + std::to_string(fg) + "m";
+		command += std::string("\033[") + bg.string() + "m";
+		command += std::string("\033[") + fg.string() + "m";
+
 		std::cout << command;
 	}
 	static void reset_color() {
