@@ -1,6 +1,7 @@
 # `lcd`: an interactive `cd`
 
-`lcd` was designed to solve the problem of cumbersome directory changes.  
+`lcd` was designed reduce keystrokes during directory changes.  
+  
 The program, despite having human-readable output, is rather useless unless used in conjunction with `lcd.sh`. This script filters all output and returns the path on its own. For *this* to be of any value, an **alias** must be created, and added to `.bashrc` (or its equivalent on your system).  
 
 ## Installation
