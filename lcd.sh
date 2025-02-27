@@ -1,6 +1,8 @@
 #!/bin/sh
 
-OUTPUT=$(./lcd)
+EXECUTABLE="/opt/lcd/lcd"
+
+OUTPUT=$($EXECUTABLE)
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -eq 0 ]; then
