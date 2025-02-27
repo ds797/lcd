@@ -11,5 +11,13 @@ This installs `lcd` to `/opt/lcd`.
 Add the following to your shell configuration: `alias lcd='cd "$(/opt/lcd/lcd.sh)"'`  
 Source the config, and you're good to go!
 
+## Usage
+Navigate via standard vim motions (`h`, `j`, `k`, `l`).  
+  
+`q` quits the program (without changing working directory).  
+`Enter` navigates to the selected directory.  
+`f`, followed by any key, searches the active pane for directories that start with that character.  
+`n` finds the next search result, while `N` finds the previous one.  
+
 ## Removal
 Simply remove `/opt/lcd`. Don't forget to get rid of your alias!
