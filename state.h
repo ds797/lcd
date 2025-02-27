@@ -40,6 +40,9 @@ namespace state {
 		void highlight_previous();
 		void highlight_next();
 
+		void jump_to_previous(char);
+		void jump_to_next(char);
+
 		void draw();
 	};
 }

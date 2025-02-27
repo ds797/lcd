@@ -109,6 +109,14 @@ void view::highlight_next() {
 	panes[pane_count - 1]->set_path(path);
 }
 
+void view::jump_to_previous(char c) {
+	active_pane().jump_to_previous(c);
+}
+
+void view::jump_to_next(char c) {
+	active_pane().jump_to_next(c);
+}
+
 void view::draw() {
 	int width_without_separators = width - (pane_count - 1);
 	int pane_width = width_without_separators / pane_count;

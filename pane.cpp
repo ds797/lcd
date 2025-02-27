@@ -111,6 +111,60 @@ void pane::highlight_next() {
 	update_frame();
 }
 
+void pane::jump_to_previous(char c) {
+	if (!index.has_value()) return;
+	std::optional<int> possible_index = {};
+
+	for (int i = index.value() - 1; i >= 0; i--) {
+		if (directories[i].filename().string().starts_with(c)) {
+			possible_index = i;
+			break;
+		}
+	}
+
+	// Loop back around
+	if (!possible_index.has_value()) {
+		for (int i = directories.size() - 1; i > index.value(); i--) {
+			if (directories[i].filename().string().starts_with(c)) {
+				possible_index = i;
+				break;
+			}		
+		}
+	}
+
+	if (possible_index.has_value()) {
+		index = possible_index;
+		update_frame();
+	}
+}
+
+void pane::jump_to_next(char c) {
+	if (!index.has_value()) return;
+	std::optional<int> possible_index = {};
+
+	for (int i = index.value() + 1; i < directories.size(); i++) {
+		if (directories[i].filename().string().starts_with(c)) {
+			possible_index = i;
+			break;
+		}		
+	}
+
+	// Loop back around
+	if (!possible_index.has_value()) {
+		for (int i = 0; i < index.value(); i++) {
+			if (directories[i].filename().string().starts_with(c)) {
+				possible_index = i;
+				break;
+			}		
+		}
+	}
+
+	if (possible_index.has_value()) {
+		index = possible_index;
+		update_frame();
+	}
+}
+
 void pane::draw_line(int line_number, int width) {
 	int index = frame + line_number;
 

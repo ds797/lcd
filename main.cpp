@@ -46,6 +46,8 @@ int main(int argc, char** argv) {
 		initial_path
 	);
 
+	std::optional<char> search = {};
+
 	char c = 0;
 	do {
 		if (c == 'q') break;
@@ -54,6 +56,13 @@ int main(int argc, char** argv) {
 		if (c == 'l') state->navigate_into();
 		if (c == 'j') state->highlight_next();
 		if (c == 'k') state->highlight_previous();
+
+		if (c == 'N') {
+			if (search.has_value()) state->jump_to_previous(search.value());
+		}
+		if (c == 'n') {
+			if (search.has_value()) state->jump_to_next(search.value());
+		}
 
 		std::optional<fs::path> active_dir = state->active_dir();
 
@@ -72,6 +81,17 @@ int main(int argc, char** argv) {
 		}
 
 		tui::clear_screen();
+		if (c == 'f') {
+			std::cout << "Enter your search character\n";
+			state->draw();
+
+			char t = 0;
+			read(STDIN_FILENO, &t, 1);
+			search = t;
+			state->jump_to_next(search.value());
+			active_dir = state->active_dir();
+		}
+
 		if (active_dir.has_value()) {
 			std::cout << active_dir.value() << "\n";
 		} else {
