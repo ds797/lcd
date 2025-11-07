@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include <vector>
+#include <optional>
 #include "color.h"
 
 namespace fs = std::filesystem;
