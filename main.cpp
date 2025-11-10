@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
 
 	fs::path initial_path = argc == 2 ? std::filesystem::absolute(argv[1]) : dir::get_cwd();
 
-	state::view* state = new state::view(
+	state::view state = state::view(
 		ws.ws_col,
 		// We printed one line already
 		ws.ws_row - 1,
@@ -51,19 +51,19 @@ int main(int argc, char** argv) {
 	do {
 		if (c == 'q') break;
 
-		if (c == 'h') state->navigate_up();
-		if (c == 'l') state->navigate_into();
-		if (c == 'j') state->highlight_next();
-		if (c == 'k') state->highlight_previous();
+		if (c == 'h') state.navigate_up();
+		if (c == 'l') state.navigate_into();
+		if (c == 'j') state.highlight_next();
+		if (c == 'k') state.highlight_previous();
 
 		if (c == 'N') {
-			if (search.has_value()) state->jump_to_previous(search.value());
+			if (search.has_value()) state.jump_to_previous(search.value());
 		}
 		if (c == 'n') {
-			if (search.has_value()) state->jump_to_next(search.value());
+			if (search.has_value()) state.jump_to_next(search.value());
 		}
 
-		std::optional<fs::path> active_dir = state->active_dir();
+		std::optional<fs::path> active_dir = state.active_dir();
 
 		if (c == '\r' || c == '\n') {
 			tui::main_buffer();
@@ -82,13 +82,13 @@ int main(int argc, char** argv) {
 		tui::clear_screen();
 		if (c == 'f') {
 			std::cout << "Enter your search character\n";
-			state->draw();
+			state.draw();
 
 			char t = 0;
 			read(STDIN_FILENO, &t, 1);
 			search = t;
-			state->jump_to_next(search.value());
-			active_dir = state->active_dir();
+			state.jump_to_next(search.value());
+			active_dir = state.active_dir();
 		}
 
 		if (active_dir.has_value()) {
@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
 			std::cout << "No active directory" << "\n";
 		}
 
-		state->draw();
+		state.draw();
 	} while (read(STDIN_FILENO, &c, 1));
 
 	tui::main_buffer();

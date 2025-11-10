@@ -31,7 +31,6 @@ namespace state {
 		view& operator=(view&&);
 	public:
 		view(int width, int height, fs::path cwd);
-		~view();
 
 		std::optional<fs::path> active_dir();
 
